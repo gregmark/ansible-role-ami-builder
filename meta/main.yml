@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Chathan Driehuys
+  description: Ansible role for creating an EC2 instance to build an AMI from.
+  license: MIT
+
+  min_ansible_version: 1.2
+
+  platforms:
+  - name: Ubuntu
+    versions:
+    - xenial
+
+  galaxy_tags:
+    - AMI
+
+dependencies: []
