@@ -10,12 +10,32 @@
     wait: yes
   with_file: "{{ ami_builder_key_file }}"
 
+- name: Create security group for AMI builder
+  local_action:
+    module: ec2_group
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    description: Security group for {{ aws_application_name }} AMI builder
+    name: "{{ ami_builder_sg_name }}"
+    region: "{{ aws_region | default(omit) }}"
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+    rules_egress:
+      - proto: -1
+        from_port: -1
+        to_port: -1
+        cidr_ip: 0.0.0.0/0
+
 - name: Create temporary instance to build AMI
   local_action:
     module: ec2
     aws_access_key: "{{ aws_access_key | default(omit) }}"
     aws_secret_key: "{{ aws_secret_key | default(omit) }}"
     count: 1
+    group: "{{ ami_builder_sg_name }}"
     image: "{{ ami_builder_base }}"
     instance_tags: "{{ ami_builder_tags }}"
     instance_type: "{{ ami_builder_instance_type }}"

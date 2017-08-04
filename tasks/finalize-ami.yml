@@ -6,7 +6,7 @@
     aws_secret_key: "{{ aws_secret_key | default(omit) }}"
     description: AMI for {{ aws_application_name }} created at {{ ansible_date_time.iso8601 }}
     instance_id: "{{ item }}"
-    name: "{{ ami_name }}"
+    name: "{{ ami_builder_ami_name }}"
     region: "{{ aws_region | default(omit) }}"
     tags:
       Application: "{{ aws_application_name }}"
@@ -26,6 +26,18 @@
     instance_ids: "{{ ami_instance.instance_ids }}"
     region: "{{ aws_region | default(omit) }}"
     state: absent
+    wait: yes
+
+- name: Delete security group for AMI builder
+  local_action:
+    module: ec2_group
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    name: "{{ ami_builder_sg_name }}"
+    region: "{{ aws_region | default(omit) }}"
+    state: absent
+  register: ami_sg_delete
+  retries: 3
 
 - name: Remove SSH key used to access AMI builder
   local_action:
@@ -33,4 +45,5 @@
     aws_access_key: "{{ aws_access_key | default(omit) }}"
     aws_secret_key: "{{ aws_secret_key | default(omit) }}"
     name: "{{ ami_builder_key_name }}"
+    region: "{{ aws_region | default(omit) }}"
     state: absent
