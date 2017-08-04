@@ -1,0 +1,24 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    aws_region: us-east-1
+    ami_builder_base: ami-9a0c088c
+
+  roles:
+    - { role: ansible-role-ami-builder, ami_builder_task: create }
+
+- hosts: amibuilder
+
+  tasks:
+    - debug:
+        msg: Perform some task on the AMI builder
+
+- hosts: localhost
+  connection: local
+
+  vars:
+    aws_region: us-east-1
+
+  roles:
+    - { role: ansible-role-ami-builder, ami_builder_task: finalize }

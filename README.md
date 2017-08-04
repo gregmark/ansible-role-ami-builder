@@ -55,6 +55,13 @@ ami_builder_default_tags:
   application: "{{ aws_application_name }}"
   role: ami-builder
 ami_builder_tags: "{{ ami_builder_default_tags | combine(aws_tags) }}"
+```
+
+The created AMI will be registered under the name `application_ami` for the host running the role with the following attributes:
+
+```YAML
+ami_builder_ami_name: "{{ aws_application_name }}-{{ ansible_date_time.iso8601 | regex_replace('[^a-zA-Z0-9]', '-') }}"
+```
 
 
 ### Usage

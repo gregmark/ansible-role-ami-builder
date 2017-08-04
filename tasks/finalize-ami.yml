@@ -1,0 +1,36 @@
+---
+- name: Create new AMI from instance
+  local_action:
+    module: ec2_ami
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    description: AMI for {{ aws_application_name }} created at {{ ansible_date_time.iso8601 }}
+    instance_id: "{{ item }}"
+    name: "{{ ami_name }}"
+    region: "{{ aws_region | default(omit) }}"
+    tags:
+      Application: "{{ aws_application_name }}"
+    wait: yes
+  with_items: "{{ ami_instance.instance_ids }}"
+  register: ami_instances
+
+- name: Save reference to created AMI
+  set_fact:
+    application_ami: "{{ ami_instances.results[0] }}"
+
+- name: Terminate instance used to build AMI
+  local_action:
+    module: ec2
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    instance_ids: "{{ ami_instance.instance_ids }}"
+    region: "{{ aws_region | default(omit) }}"
+    state: absent
+
+- name: Remove SSH key used to access AMI builder
+  local_action:
+    module: ec2_key
+    aws_access_key: "{{ aws_access_key | default(omit) }}"
+    aws_secret_key: "{{ aws_secret_key | default(omit) }}"
+    name: "{{ ami_builder_key_name }}"
+    state: absent
