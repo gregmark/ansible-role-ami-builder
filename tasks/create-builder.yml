@@ -37,6 +37,7 @@
     count: 1
     group: "{{ ami_builder_sg_name }}"
     image: "{{ ami_builder_base }}"
+    instance_profile_name: "{{ ami_builder_instance_role | default(omit) }}"
     instance_tags: "{{ ami_builder_tags }}"
     instance_type: "{{ ami_builder_instance_type }}"
     key_name: "{{ ami_builder_key_name }}"
