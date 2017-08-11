@@ -1,0 +1,17 @@
+---
+aws_application_name: my-application
+aws_tags: {}
+
+ami_builder_key_file: ~/.ssh/id_rsa.pub
+ami_builder_key_name: "{{ aws_application_name }}-key"
+
+ami_builder_sg_name: "{{ aws_application_name }}-ami-builder-sg"
+
+ami_builder_instance_type: t2.nano
+
+ami_builder_default_tags:
+  application: "{{ aws_application_name }}"
+  role: ami-builder
+ami_builder_tags: "{{ ami_builder_default_tags | combine(aws_tags) }}"
+
+ami_builder_ami_name: "{{ aws_application_name }}-{{ ansible_date_time.iso8601 | regex_replace('[^a-zA-Z0-9]', '-') }}"

@@ -1,0 +1,39 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    aws_application_name: ansible-role-ami-builder-test
+    aws_region: us-east-1
+    ami_builder_base: ami-9a0c088c
+
+  roles:
+    - { role: ansible-role-ami-builder, ami_builder_task: create }
+
+- hosts: amibuilder
+  gather_facts: no
+
+  pre_tasks:
+    - name: Install python 2
+      become: yes
+      become_user: root
+      remote_user: ubuntu
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      register: output
+      changed_when: output.stdout != ""
+      until: output.rc == 0
+      retries: 3
+      delay: 1
+
+  tasks:
+    - debug:
+        msg: Perform some task on the AMI builder
+
+- hosts: localhost
+  connection: local
+
+  vars:
+    aws_application_name: ansible-role-ami-builder-test
+    aws_region: us-east-1
+
+  roles:
+    - { role: ansible-role-ami-builder, ami_builder_task: finalize }

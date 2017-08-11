@@ -1,0 +1,8 @@
+---
+- name: Finalize AMI
+  include: finalize-ami.yml
+  when: ami_builder_task == 'finalize'
+
+- name: Create AMI builder instance
+  include: create-builder.yml
+  when: ami_builder_task == 'create'
